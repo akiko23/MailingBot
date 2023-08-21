@@ -5,9 +5,9 @@ from states.states import Message
 from config import bot, dp, db, ADMIN_ID
 from markups.markups import main_menu as mmenu
 
-
 from handlers.hello_msg import *
 from handlers.mailing import *
+
 
 @dp.message_handler(commands=["start"])
 async def start(msg: types.Message):
@@ -15,6 +15,7 @@ async def start(msg: types.Message):
     if not db.user_exists(user_id):
         db.add_user(user_id)
     await bot.send_message(user_id, "Выберите действие", reply_markup=mmenu)
+
 
 @dp.callback_query_handler(lambda call: call.data.startswith("mmenu"))
 async def main_menu_handler(call: types.CallbackQuery):
@@ -37,6 +38,7 @@ async def main_menu_handler(call: types.CallbackQuery):
             ))
             await Message.get_new_hello_message.set()
 
+
 @dp.callback_query_handler(lambda call: call.data == "cancel_action", state=Message.all_states)
 async def cancel_action(call, state):
     await bot.delete_message(ADMIN_ID, call.message.message_id)
@@ -44,8 +46,11 @@ async def cancel_action(call, state):
     await bot.send_message(ADMIN_ID, "Вы отменили действие", reply_markup=mmenu)
     await state.finish()
 
+
 def main():
     executor.start_polling(dp, allowed_updates=["update_id", "callback_query", "message", "channel_post", "chat_member", "chat_join_request"])
 
+
 if __name__ == "__main__":
     main()
+    
